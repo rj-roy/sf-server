@@ -1,0 +1,20 @@
+{
+  "name": "sf-server",
+  "version": "0.0.1",
+  "description": "",
+  "license": "ISC",
+  "author": "rj-roy",
+  "type": "commonjs",
+  "main": "sf.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.3.0",
+    "mongodb-uri": "^0.9.7"
+  }
+}
