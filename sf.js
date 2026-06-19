@@ -12,7 +12,7 @@ app.use(express.json());
 const client = new MongoClient(process.env.DB_URI, {
     serverApi: {
         version: ServerApiVersion.v1,
-        strict: true,
+        strict: false,
         deprecationErrors: true,
     },
 });
@@ -23,13 +23,26 @@ const run = async () => {
         const db = await client.db(process.env.DB_NAME);
         const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
 
-        app.get('/startups', async (req, res) => {
+        app.get('/api/startups', async (req, res) => {
             const cursor = startupsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         });
 
-    } catch (error) {
+        app.get('/api/startups/field', async (req, res) => {
+            const field = req.query.field_name;
+            const cursor = await startupsCollection.distinct(field);
+            res.send(cursor);
+        });
+
+        app.get('/api/startups/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await startupsCollection.findOne(query);
+            res.send(result);
+        });
+
+    } finally {
         // console.error('Error connecting to MongoDB:', error);
     };
 };
