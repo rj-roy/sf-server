@@ -22,6 +22,7 @@ const run = async () => {
         await client.connect();
         const db = await client.db(process.env.DB_NAME);
         const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
+        const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
 
         app.get('/api/startups', async (req, res) => {
             const cursor = startupsCollection.find();
@@ -76,6 +77,12 @@ const run = async () => {
         app.delete('/api/startup/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await startupsCollection.deleteOne({ _id: new ObjectId(id) });
+            res.send(result);
+        });
+
+        app.post('/api/opportunities/create', async (req, res) => {
+            const data = req.body;
+            const result = await opportunitiesCollection.insertOne(data);
             res.send(result);
         });
 
