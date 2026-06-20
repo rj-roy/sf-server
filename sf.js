@@ -42,10 +42,8 @@ const run = async () => {
             res.send(result);
         });
 
-        app.get('/api/startups/founder/:id/count', async (req, res) => {
+        app.get('/api/startups/founder/:id', async (req, res) => {
             const id = req.params.id;
-            // const count = await startupsCollection.countDocuments({ 'founder.founder_id': id });
-            // res.send({ count });
             const result = await startupsCollection.findOne(
                 { 'founder.founder_id': id },
             )
@@ -66,6 +64,12 @@ const run = async () => {
             if (!result) {
                 return res.status(404).send({ error: 'Startup not found' });
             }
+            res.send(result);
+        });
+
+        app.post('/api/startup/create', async (req, res) => {
+            const data = req.body;
+            const result = await startupsCollection.insertOne(data);
             res.send(result);
         });
 
