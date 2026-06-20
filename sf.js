@@ -86,6 +86,20 @@ const run = async () => {
             res.send(result);
         });
 
+        app.get('/api/opportunities/founder/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await opportunitiesCollection.find(
+                { 'founder_id': id },
+            ).toArray()
+            res.send(result);
+        });
+
+        app.delete('/api/opportunities/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await opportunitiesCollection.deleteOne({ _id: new ObjectId(id) });
+            res.send(result);
+        });
+
     } finally {
         // console.error('Error connecting to MongoDB:', error);
     };
