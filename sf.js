@@ -23,6 +23,7 @@ const run = async () => {
         const db = await client.db(process.env.DB_NAME);
         const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
         const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
+        const userCollection = await db.collection(process.env.USERS_COLLECTION);
 
         app.get('/api/startups', async (req, res) => {
             const cursor = startupsCollection.find();
@@ -113,6 +114,33 @@ const run = async () => {
         app.delete('/api/opportunities/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await opportunitiesCollection.deleteOne({ _id: new ObjectId(id) });
+            res.send(result);
+        });
+
+        app.patch('/api/user/update/:id', async (req, res) => {
+            const { id } = req.params;
+            const { name, email, profileImage } = req.body;
+            const updateDoc = {
+                $set: {}
+            };
+
+            if (name !== undefined) {
+                updateDoc.$set.name = name;
+            };
+            if (email !== undefined) {
+                updateDoc.$set.email = email;
+            };
+            if (profileImage !== undefined) {
+                updateDoc.$set.profileImage = profileImage;
+            };
+
+            const result = await userCollection.findOneAndUpdate(
+                { _id: new ObjectId(id) },
+                updateDoc,
+                {
+                    returnDocument: "after"
+                }
+            );
             res.send(result);
         });
 
