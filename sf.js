@@ -68,6 +68,22 @@ const run = async () => {
             res.send(result);
         });
 
+        app.patch('/api/opportunities/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const { _id, ...updateData } = req.body;
+            const filter = { _id: new ObjectId(id) };
+
+            const result = await opportunitiesCollection.findOneAndUpdate(
+                filter,
+                { $set: updateData },
+                { returnDocument: 'after' }
+            );
+            if (!result) {
+                return res.status(404).send({ error: 'Startup not found' });
+            }
+            res.send(result);
+        });
+
         app.post('/api/startup/create', async (req, res) => {
             const data = req.body;
             const result = await startupsCollection.insertOne(data);
