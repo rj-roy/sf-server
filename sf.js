@@ -42,6 +42,33 @@ const run = async () => {
             res.send(result);
         });
 
+        app.get('/api/startups/founder/:id/count', async (req, res) => {
+            const id = req.params.id;
+            // const count = await startupsCollection.countDocuments({ 'founder.founder_id': id });
+            // res.send({ count });
+            const result = await startupsCollection.findOne(
+                { 'founder.founder_id': id },
+            )
+            res.send(result);
+        });
+
+        app.patch('/api/startup/:id', async (req, res) => {
+            const id = req.params.id;
+            const { _id, ...updateData } = req.body;
+            const filter = { _id: new ObjectId(id) };
+
+            const result = await startupsCollection.findOneAndUpdate(
+                filter,
+                { $set: updateData },
+                { returnDocument: 'after' }
+            );
+
+            if (!result) {
+                return res.status(404).send({ error: 'Startup not found' });
+            }
+            res.send(result);
+        });
+
     } finally {
         // console.error('Error connecting to MongoDB:', error);
     };
