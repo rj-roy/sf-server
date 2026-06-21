@@ -184,7 +184,16 @@ const run = async () => {
 
         app.patch('/api/application/update/status/:id', async (req, res) => {
             const id = req.params.id;
-            // const { status } = req.body;
+            const { newStatus } = req.body;
+
+            const validStatuses = ['pending', 'approved', 'rejected'];
+            if (!status || !validStatuses.includes(status)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid status. Must be one of: pending, approved, rejected"
+                });
+            };
+
             const filter = { _id: new ObjectId(id) };
 
             const result = await applicationsCollection.findOneAndUpdate(
