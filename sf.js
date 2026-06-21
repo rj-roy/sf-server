@@ -21,13 +21,65 @@ const run = async () => {
     try {
         await client.connect();
         const db = await client.db(process.env.DB_NAME);
+        const userCollection = await db.collection(process.env.USERS_COLLECTION);
         const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
         const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
-        const userCollection = await db.collection(process.env.USERS_COLLECTION);
+        const applicationsCollection = await db.collection(process.env.APPLICATIONS_COLLECTION);
+
+        app.patch('/api/user/update/:id', async (req, res) => {
+            const { id } = req.params;
+            const { name, email, profileImage } = req.body;
+            const updateDoc = {
+                $set: {}
+            };
+
+            if (name !== undefined) {
+                updateDoc.$set.name = name;
+            };
+            if (email !== undefined) {
+                updateDoc.$set.email = email;
+            };
+            if (profileImage !== undefined) {
+                updateDoc.$set.profileImage = profileImage;
+            };
+
+            const result = await userCollection.findOneAndUpdate(
+                { _id: new ObjectId(id) },
+                updateDoc,
+                {
+                    returnDocument: "after"
+                }
+            );
+            res.send(result);
+        });
+
+        app.post('/api/startup/create', async (req, res) => {
+            const data = req.body;
+            const result = await startupsCollection.insertOne(data);
+            res.send(result);
+        });
 
         app.get('/api/startups', async (req, res) => {
             const cursor = startupsCollection.find();
             const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        app.get('/api/startups/approved', async (req, res) => {
+            const query = { status: 'approved' };
+            const result = await startupsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        app.get('/api/startups/pending', async (req, res) => {
+            const query = { status: 'pending' };
+            const result = await startupsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        app.get('/api/startups/rejected', async (req, res) => {
+            const query = { status: 'rejected' };
+            const result = await startupsCollection.find(query).toArray();
             res.send(result);
         });
 
@@ -69,28 +121,6 @@ const run = async () => {
             res.send(result);
         });
 
-        app.patch('/api/opportunities/update/:id', async (req, res) => {
-            const id = req.params.id;
-            const { _id, ...updateData } = req.body;
-            const filter = { _id: new ObjectId(id) };
-
-            const result = await opportunitiesCollection.findOneAndUpdate(
-                filter,
-                { $set: updateData },
-                { returnDocument: 'after' }
-            );
-            if (!result) {
-                return res.status(404).send({ error: 'Startup not found' });
-            }
-            res.send(result);
-        });
-
-        app.post('/api/startup/create', async (req, res) => {
-            const data = req.body;
-            const result = await startupsCollection.insertOne(data);
-            res.send(result);
-        });
-
         app.delete('/api/startup/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await startupsCollection.deleteOne({ _id: new ObjectId(id) });
@@ -100,6 +130,12 @@ const run = async () => {
         app.post('/api/opportunities/create', async (req, res) => {
             const data = req.body;
             const result = await opportunitiesCollection.insertOne(data);
+            res.send(result);
+        });
+
+        app.get('/api/opportunities', async (req, res) => {
+            const cursor = opportunitiesCollection.find();
+            const result = await cursor.toArray();
             res.send(result);
         });
 
@@ -117,30 +153,32 @@ const run = async () => {
             res.send(result);
         });
 
-        app.patch('/api/user/update/:id', async (req, res) => {
-            const { id } = req.params;
-            const { name, email, profileImage } = req.body;
-            const updateDoc = {
-                $set: {}
-            };
+        app.patch('/api/opportunities/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const { _id, ...updateData } = req.body;
+            const filter = { _id: new ObjectId(id) };
 
-            if (name !== undefined) {
-                updateDoc.$set.name = name;
-            };
-            if (email !== undefined) {
-                updateDoc.$set.email = email;
-            };
-            if (profileImage !== undefined) {
-                updateDoc.$set.profileImage = profileImage;
-            };
-
-            const result = await userCollection.findOneAndUpdate(
-                { _id: new ObjectId(id) },
-                updateDoc,
-                {
-                    returnDocument: "after"
-                }
+            const result = await opportunitiesCollection.findOneAndUpdate(
+                filter,
+                { $set: updateData },
+                { returnDocument: 'after' }
             );
+            if (!result) {
+                return res.status(404).send({ error: 'Startup not found' });
+            }
+            res.send(result);
+        });
+
+        app.post('/api/opportunity/application/create', async (req, res) => {
+            const data = req.body;
+            const result = await applicationsCollection.insertOne(data);
+            res.send(result);
+        });
+
+        app.get('/api/application/founder/:id', async (req, res) => {
+            const founderId = req.params.id;
+            const query = {founderId: founderId};
+            const result = await applicationsCollection.find(query).toArray();
             res.send(result);
         });
 
