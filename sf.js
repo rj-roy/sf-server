@@ -177,9 +177,28 @@ const run = async () => {
 
         app.get('/api/application/founder/:id', async (req, res) => {
             const founderId = req.params.id;
-            const query = {founderId: founderId};
+            const query = { founderId: founderId };
             const result = await applicationsCollection.find(query).toArray();
             res.send(result);
+        });
+
+        app.patch('/api/application/update/status/:id', async (req, res) => {
+            const id = req.params.id;
+            // const { status } = req.body;
+            const filter = { _id: new ObjectId(id) };
+
+            const result = await applicationsCollection.findOneAndUpdate(
+                filter,
+                { $set: req.body },
+                { returnDocument: 'after' }
+            );
+            if (!result) {
+                return res.status(404).send({ error: 'Startup not found' });
+            };
+            res.send({
+                success: true,
+                data: result,
+            });
         });
 
     } finally {
