@@ -35,6 +35,24 @@ const run = async () => {
             });
         });
 
+        app.patch('/api/users/update/status/:id', async (req, res) => {
+            const userId = req.params.id;
+            const { status } = req.body;
+            const query = { _id: new ObjectId(userId) };
+
+            const result = await userCollection.findOneAndUpdate(
+                query,
+                { $set: { status } },
+                { returnDocument: "after" },
+            );
+
+            res.send({
+                success: true,
+                message: "User status updated successfully",
+                data: result
+            });
+        });
+
         app.patch('/api/user/update/:id', async (req, res) => {
             const { id } = req.params;
             const { name, email, profileImage } = req.body;
