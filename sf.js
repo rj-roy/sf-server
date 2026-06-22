@@ -147,6 +147,15 @@ const run = async () => {
             res.send(result);
         });
 
+        app.get('/api/opportunities/startup/:id', async (req, res) => {
+            const startupId = req.params.id;
+            const result = await opportunitiesCollection.find({ 'startup_id': startupId }).toArray();
+            res.send({
+                status: true,
+                data: result,
+            });
+        });
+
         app.delete('/api/opportunities/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await opportunitiesCollection.deleteOne({ _id: new ObjectId(id) });
