@@ -59,6 +59,29 @@ const run = async () => {
             res.send(result);
         });
 
+        app.patch('/api/startup/status/update/:id', async (req, res) => {
+            const startupId = req.params.id;
+            const newStatus = req.body;
+            const query = { _id: new ObjectId(startupId) };
+            const result = await startupsCollection.findOneAndUpdate(
+                query,
+                {
+                    $set: newStatus
+                },
+                { returnDocument: 'after' },
+            );
+
+            if (!result) {
+                return res.status(404).send(
+                    { success: false, error: 'Something went wrong! Please try again later.' });
+            };
+
+            res.send({
+                success: true,
+                data: result,
+            });
+        });
+
         app.get('/api/startups', async (req, res) => {
             const cursor = startupsCollection.find();
             const result = await cursor.toArray();
@@ -193,7 +216,7 @@ const run = async () => {
 
         app.patch('/api/application/update/status/:id', async (req, res) => {
             const id = req.params.id;
-            const { newStatus } = req.body;
+            const { status } = req.body;
 
             const validStatuses = ['pending', 'approved', 'rejected'];
             if (!status || !validStatuses.includes(status)) {
