@@ -26,6 +26,15 @@ const run = async () => {
         const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
         const applicationsCollection = await db.collection(process.env.APPLICATIONS_COLLECTION);
 
+        app.get('/api/users', async (req, res) => {
+            const cursor = userCollection.find();
+            const result = await cursor.toArray();
+            res.send({
+                success: true,
+                data: result
+            });
+        });
+
         app.patch('/api/user/update/:id', async (req, res) => {
             const { id } = req.params;
             const { name, email, profileImage } = req.body;
@@ -147,7 +156,10 @@ const run = async () => {
         app.delete('/api/startup/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await startupsCollection.deleteOne({ _id: new ObjectId(id) });
-            res.send(result);
+            res.send({
+                success: true,
+                data: result,
+            });
         });
 
         app.post('/api/opportunities/create', async (req, res) => {
@@ -182,7 +194,10 @@ const run = async () => {
         app.delete('/api/opportunities/delete/:id', async (req, res) => {
             const id = req.params.id;
             const result = await opportunitiesCollection.deleteOne({ _id: new ObjectId(id) });
-            res.send(result);
+            res.send({
+                success: true,
+                data: result,
+            });
         });
 
         app.patch('/api/opportunities/update/:id', async (req, res) => {
