@@ -19,12 +19,12 @@ const client = new MongoClient(process.env.DB_URI, {
 
 const run = async () => {
     try {
-        await client.connect();
-        const db = await client.db(process.env.DB_NAME);
-        const userCollection = await db.collection(process.env.USERS_COLLECTION);
-        const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
-        const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
-        const applicationsCollection = await db.collection(process.env.APPLICATIONS_COLLECTION);
+        // await client.connect();
+        const db = client.db(process.env.DB_NAME);
+        const userCollection = db.collection(process.env.USERS_COLLECTION);
+        const startupsCollection = db.collection(process.env.STARTUPS_COLLECTION);
+        const opportunitiesCollection = db.collection(process.env.OPPORTUNITIES_COLLECTION);
+        const applicationsCollection = db.collection(process.env.APPLICATIONS_COLLECTION);
 
         app.get('/api/users', async (req, res) => {
             const cursor = userCollection.find();
