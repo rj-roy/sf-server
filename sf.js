@@ -19,7 +19,6 @@ const client = new MongoClient(process.env.DB_URI, {
 
 const run = async () => {
     try {
-        // await client.connect();
         const db = client.db(process.env.DB_NAME);
         const userCollection = db.collection(process.env.USERS_COLLECTION);
         const startupsCollection = db.collection(process.env.STARTUPS_COLLECTION);
@@ -276,7 +275,7 @@ const run = async () => {
             const id = req.params.id;
             const { status } = req.body;
 
-            const validStatuses = ['pending', 'approved', 'rejected'];
+            const validStatuses = ['pending', 'approved', 'rejected', 'cancelled'];
             if (!status || !validStatuses.includes(status)) {
                 return res.status(400).json({
                     success: false,
@@ -292,7 +291,7 @@ const run = async () => {
                 { returnDocument: 'after' }
             );
             if (!result) {
-                return res.status(404).send({ error: 'Startup not found' });
+                return res.status(404).send({ error: 'Something went wrong!' });
             };
             res.send({
                 success: true,
