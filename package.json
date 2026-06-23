@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "rj-roy",
   "type": "commonjs",
-  "main": "sf.js",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
