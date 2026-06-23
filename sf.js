@@ -244,7 +244,32 @@ const run = async () => {
             const founderId = req.params.id;
             const query = { founderId: founderId };
             const result = await applicationsCollection.find(query).toArray();
-            res.send(result);
+            res.send({
+                success: true,
+                data: result,
+            });
+        });
+
+        app.get('/api/application/collaborator/:id', async (req, res) => {
+            const colId = req.params.id;
+            const query = { userId: colId };
+
+            const result = await applicationsCollection.find(query).toArray();
+            if (!result) {
+                return res.status(404).send({ error: 'Application not found' });
+            };
+            res.send({
+                success: true,
+                data: result,
+            });
+        });
+
+        app.get('/api/applications', async (req, res) => {
+            const result = await applicationsCollection.find().toArray();
+            res.send({
+                success: true,
+                data: result,
+            });
         });
 
         app.patch('/api/application/update/status/:id', async (req, res) => {
