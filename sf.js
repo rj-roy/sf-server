@@ -9,6 +9,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.send({ success: true, message: 'Backend server is running' });
+});
+
 const client = new MongoClient(process.env.DB_URI, {
     serverApi: {
         version: ServerApiVersion.v1,
