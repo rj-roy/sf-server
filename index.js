@@ -9,9 +9,6 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send({ success: true, message: 'Backend server is running' });
-});
 
 const client = new MongoClient(process.env.DB_URI, {
     serverApi: {
@@ -28,8 +25,36 @@ const run = async () => {
         const startupsCollection = await db.collection(process.env.STARTUPS_COLLECTION);
         const opportunitiesCollection = await db.collection(process.env.OPPORTUNITIES_COLLECTION);
         const applicationsCollection = await db.collection(process.env.APPLICATIONS_COLLECTION);
+        const sessionCollection = await db.collection(process.env.SESSION_COLLECTION);
 
-        app.get('/api/users', async (req, res) => {
+        const verifyToken = async (req, res, next) => {
+            const authHeader = req.headers?.authorization;
+            if (!authHeader) {
+                return res.status(401).send({ message: 'Unauthorized Acces' });
+            };
+
+            const token = authHeader.split(' ')[1];
+            if (!token) {
+                return res.status(401).send({ message: 'Unauthorized T Access' });
+            };
+
+            const query = { token: token };
+            const session = await sessionCollection.findOne(query);
+            if (!session) {
+                return res.status(401).send({ message: 'Sorry! session not found.' });
+            };
+
+            const userQuery = { _id: session?.userId };
+            const user = await userCollection.findOne(userQuery);
+            if (!user) {
+                return res.status(404).send({ message: 'User Not Found' });
+            };
+
+            req.user = user;
+            next();
+        };
+
+        app.get('/api/users', verifyToken, async (req, res) => {
             const cursor = userCollection.find();
             const result = await cursor.toArray();
             res.send({
