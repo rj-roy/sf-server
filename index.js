@@ -70,6 +70,14 @@ const run = async () => {
             };
         };
 
+        const verifyFounder = async (req, res, next) => {
+            if (req.user?.role !== 'founder') {
+                return res.status(403).send({ message: 'Unauthorized Users Access' });
+            } else if (req.user?.role === 'founder') {
+                next();
+            };
+        };
+
 
         app.get('/api/users', verifyToken, verifyAdmin, async (req, res) => {
             const cursor = userCollection.find();
@@ -97,8 +105,18 @@ const run = async () => {
             });
         });
 
-        app.patch('/api/user/update/:id', async (req, res) => {
+        app.patch('/api/user/update/:id', verifyToken, async (req, res) => {
             const { id } = req.params;
+            const userObjectId = new ObjectId(req.user?._id);
+            const userId = userObjectId.toHexString();
+
+            if (userId !== id) {
+                return res.status(403).send({
+                    success: false,
+                    message: 'You are not authorized to update this profile.'
+                });
+            };
+
             const { name, email, profileImage } = req.body;
             const updateDoc = {
                 $set: {}
