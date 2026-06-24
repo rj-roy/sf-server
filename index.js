@@ -62,6 +62,14 @@ const run = async () => {
             };
         };
 
+        const verifyCollaborator = async (req, res, next) => {
+            if (req.user?.role !== 'collaborator') {
+                return res.status(403).send({ message: 'Unauthorized Users Access' });
+            } else if (req.user?.role === 'collaborator') {
+                next();
+            };
+        };
+
 
         app.get('/api/users', verifyToken, verifyAdmin, async (req, res) => {
             const cursor = userCollection.find();
@@ -72,7 +80,7 @@ const run = async () => {
             });
         });
 
-        app.patch('/api/users/update/status/:id', async (req, res) => {
+        app.patch('/api/users/update/status/:id', verifyToken, verifyAdmin, async (req, res) => {
             const userId = req.params.id;
             const { status } = req.body;
             const query = { _id: new ObjectId(userId) };
@@ -82,7 +90,6 @@ const run = async () => {
                 { $set: { status } },
                 { returnDocument: "after" },
             );
-
             res.send({
                 success: true,
                 message: "User status updated successfully",
