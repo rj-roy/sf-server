@@ -54,7 +54,16 @@ const run = async () => {
             next();
         };
 
-        app.get('/api/users', verifyToken, async (req, res) => {
+        const verifyAdmin = async (req, res, next) => {
+            if (req.user?.role !== 'admin') {
+                return res.status(403).send({ message: 'Unauthorized Users Access' });
+            } else if (req.user?.role === 'admin') {
+                next();
+            };
+        };
+
+
+        app.get('/api/users', verifyToken, verifyAdmin, async (req, res) => {
             const cursor = userCollection.find();
             const result = await cursor.toArray();
             res.send({
