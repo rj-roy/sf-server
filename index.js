@@ -142,13 +142,13 @@ const run = async () => {
             res.send(result);
         });
 
-        app.post('/api/startup/create', async (req, res) => {
+        app.post('/api/startup/create', verifyAdmin, verifyFounder, async (req, res) => {
             const data = req.body;
             const result = await startupsCollection.insertOne(data);
             res.send(result);
         });
 
-        app.patch('/api/startup/status/update/:id', async (req, res) => {
+        app.patch('/api/startup/status/update/:id', verifyAdmin, verifyAdmin, async (req, res) => {
             const startupId = req.params.id;
             const newStatus = req.body;
             const query = { _id: new ObjectId(startupId) };
@@ -183,13 +183,13 @@ const run = async () => {
             res.send(result);
         });
 
-        app.get('/api/startups/pending', async (req, res) => {
+        app.get('/api/startups/pending', verifyToken, async (req, res) => {
             const query = { status: 'pending' };
             const result = await startupsCollection.find(query).toArray();
             res.send(result);
         });
 
-        app.get('/api/startups/rejected', async (req, res) => {
+        app.get('/api/startups/rejected', verifyToken, verifyAdmin, async (req, res) => {
             const query = { status: 'rejected' };
             const result = await startupsCollection.find(query).toArray();
             res.send(result);
@@ -233,7 +233,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.delete('/api/startup/delete/:id', async (req, res) => {
+        app.delete('/api/startup/delete/:id', verifyToken, verifyAdmin, async (req, res) => {
             const id = req.params.id;
             const result = await startupsCollection.deleteOne({ _id: new ObjectId(id) });
             res.send({
@@ -242,7 +242,7 @@ const run = async () => {
             });
         });
 
-        app.post('/api/opportunities/create', async (req, res) => {
+        app.post('/api/opportunities/create', verifyToken, verifyFounder, async (req, res) => {
             const data = req.body;
             const result = await opportunitiesCollection.insertOne(data);
             res.send(result);
@@ -271,7 +271,7 @@ const run = async () => {
             });
         });
 
-        app.delete('/api/opportunities/delete/:id', async (req, res) => {
+        app.delete('/api/opportunities/delete/:id', verifyToken, verifyFounder, async (req, res) => {
             const id = req.params.id;
             const result = await opportunitiesCollection.deleteOne({ _id: new ObjectId(id) });
             res.send({
@@ -296,7 +296,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.post('/api/opportunity/application/create', async (req, res) => {
+        app.post('/api/opportunity/application/create', verifyToken, verifyCollaborator, async (req, res) => {
             const data = req.body;
             const result = await applicationsCollection.insertOne(data);
             res.send(result);
@@ -334,7 +334,35 @@ const run = async () => {
             });
         });
 
-        app.patch('/api/application/update/status/:id', async (req, res) => {
+        app.patch('/api/application/update/status/:id', verifyToken, verifyFounder, async (req, res) => {
+            const id = req.params.id;
+            const { status } = req.body;
+
+            const validStatuses = ['pending', 'approved', 'rejected'];
+            if (!status || !validStatuses.includes(status)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid status."
+                });
+            };
+
+            const filter = { _id: new ObjectId(id) };
+
+            const result = await applicationsCollection.findOneAndUpdate(
+                filter,
+                { $set: req.body },
+                { returnDocument: 'after' }
+            );
+            if (!result) {
+                return res.status(404).send({ error: 'Something went wrong!' });
+            };
+            res.send({
+                success: true,
+                data: result,
+            });
+        });
+
+        app.patch('/api/application/update/status/cancelled/:id', verifyToken, verifyCollaborator, async (req, res) => {
             const id = req.params.id;
             const { status } = req.body;
 
@@ -342,7 +370,7 @@ const run = async () => {
             if (!status || !validStatuses.includes(status)) {
                 return res.status(400).json({
                     success: false,
-                    message: "Invalid status. Must be one of: pending, approved, rejected"
+                    message: "Invalid status."
                 });
             };
 
