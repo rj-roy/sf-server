@@ -1,20 +1,19 @@
 {
-  "name": "sf-server",
-  "version": "0.0.1",
-  "description": "",
-  "license": "ISC",
+  "name": "startup-forge-server",
+  "version": "1.0.0",
+  "description": "Startup Forge API server",
   "author": "rj-roy",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "node --watch index.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongodb": "^7.3.0",
-    "mongodb-uri": "^0.9.7"
-  }
+    "mongodb": "^7.3.0"
+  },
+  "devDependencies": {}
 }
