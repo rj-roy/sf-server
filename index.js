@@ -88,9 +88,9 @@ const run = async () => {
 
         const verifyStAlreadyC = async (req, res, next) => {
             const userId = req.user?._id?.toHexString();
-            const query = { _id: new ObjectId(userId) };
+            const query = { 'founder.founder_id': userId };
 
-            const isExsist = !!(await startupsCollection.find(
+            const isExsist = !!(await startupsCollection.findOne(
                 query,
                 { projection: { _id: 1 } },
             ));
@@ -138,16 +138,20 @@ const run = async () => {
                 return next();
             };
 
+            const reqOpId = req.params.id;
             const reqUser = req.user?._id?.toHexString();
+
             const verifiedData = await opportunitiesCollection.findOne(
-                { founder_id: reqUser },
+                {
+                    founder_id: reqUser,
+                    _id: new ObjectId(reqOpId)
+                },
                 { projection: { _id: 1 } },
             );
             if (!verifiedData) {
                 return res.status(403).send({ message: "Forbidden! Data not found" })
             };
 
-            const reqOpId = req.params.id;
             const verfiedOwner = verifiedData?._id?.toHexString() === reqOpId;
             if (!verfiedOwner) {
                 return res.status(403).send({ message: "Forbidden Owner Access" });
@@ -295,7 +299,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.patch('/api/startup/:id', verifyToken, verifyFounder, async (req, res) => {
+        app.patch('/api/startup/:id', verifyToken, verifyFounder, verifyStartupOwner, async (req, res) => {
             const reqStartupId = req.params.id;
 
             const { _id, ...updateData } = req.body;
@@ -313,7 +317,7 @@ const run = async () => {
             res.send(result);
         });
 
-        app.delete('/api/startup/delete/:id', async (req, res) => {
+        app.delete('/api/startup/delete/:id', verifyToken, verifyStartupOwner, async (req, res) => {
             const id = req.params.id;
             const result = await startupsCollection.deleteOne({ _id: new ObjectId(id) });
             res.send({
