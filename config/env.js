@@ -19,6 +19,7 @@ export const env = {
         applications: required('APPLICATIONS_COLLECTION'),
         sessions: required('SESSION_COLLECTION'),
         subscription: required('SUBSCRIPTION_COLLECTION'),
+        plan: required('PLAN_COLLECTION'),
     },
 
     clientOrigins: (process.env.CLIENT_ORIGINS || '')

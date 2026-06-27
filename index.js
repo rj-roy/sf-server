@@ -17,6 +17,7 @@ import opportunityActionsRoutes from './routes/opportunityActions.routes.js';
 import applicationRoutes from './routes/application.routes.js';
 import applicationsRoutes from './routes/applications.routes.js';
 import subscriptionRoutes from './routes/subscription.routes.js';
+import planRoutes from './routes/plan.routes.js';
 
 const app = express();
 
@@ -39,7 +40,9 @@ app.use('/api/opportunities', opportunityActionsRoutes);
 app.use('/api/application', applicationRoutes);
 app.use('/api/applications', applicationsRoutes);
 
-app.use('/api/subscription', subscriptionRoutes)
+app.use('/api/subscription', subscriptionRoutes);
+
+app.use('/api/plan', planRoutes);
 
 app.get('/', (req, res) => {
     res.send('Startup Forge API is running');

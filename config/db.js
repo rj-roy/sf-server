@@ -28,6 +28,7 @@ export const connectDB = async () => {
         applicationsCollection: db.collection(env.collections.applications),
         sessionCollection: db.collection(env.collections.sessions),
         subscriptonCollection: db.collection(env.collections.subscription),
+        planCollection: db.collection(env.collections.plan),
     };
 
     console.log('MongoDB connected');
