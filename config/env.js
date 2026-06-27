@@ -18,6 +18,7 @@ export const env = {
         opportunities: required('OPPORTUNITIES_COLLECTION'),
         applications: required('APPLICATIONS_COLLECTION'),
         sessions: required('SESSION_COLLECTION'),
+        subscription: required('SUBSCRIPTION_COLLECTION'),
     },
 
     clientOrigins: (process.env.CLIENT_ORIGINS || '')
