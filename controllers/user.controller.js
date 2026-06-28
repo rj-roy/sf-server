@@ -2,6 +2,7 @@ import { getCollections } from '../config/db.js';
 import { toObjectId } from '../utils/toObjectId.js';
 import { ApiError } from '../utils/ApiError.js';
 import { requireFields } from '../utils/requireFields.js';
+import { ObjectId } from 'mongodb';
 
 export const getAllUsers = async (req, res) => {
     const { userCollection } = getCollections();
@@ -33,6 +34,26 @@ export const updateUserStatus = async (req, res) => {
     });
 };
 
+export const updateUserPlan = async (req, res) => {
+    const { userCollection } = getCollections();
+    const userId = req.params.id;
+    const { plan } = req.body;
+
+    const result = await userCollection.findOneAndUpdate(
+        { _id: new ObjectId(userId) },
+        { $set: { plan } },
+        { returnDocument: 'after' },
+    );
+
+    if (!result) {
+        throw new ApiError(404, 'User not found');
+    };
+
+    res.send({
+        success: true,
+        message: `Plan Updated to ${plan}`
+    });
+};
 export const updateOwnProfile = async (req, res) => {
     const { userCollection } = getCollections();
     const targetId = toObjectId(req.params.id, 'user ID');
