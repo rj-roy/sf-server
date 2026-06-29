@@ -1,4 +1,5 @@
 import { getCollections } from "../config/db.js"
+import { ApiError } from "../utils/ApiError.js";
 
 export const createSubscription = async (req, res) => {
     const { subscriptonCollection } = getCollections();
@@ -43,16 +44,16 @@ export const isExistSubscription = async (req, res, next) => {
 
         if (existing) {
             return res.send({
-                success: true,
+                isExist: true,
                 data: {
                     heading: "You're all done here",
                     paragraph: "You've either completed your payment or this checkout session has timed out."
                 }
             });
-        }
+        };
 
         return res.send({
-            success: true,
+            isExist: false,
             message: "No existing session found, safe to push data to db"
         });
     } catch (err) {
