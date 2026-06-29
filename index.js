@@ -2,7 +2,6 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 
-import { env } from './config/env.js';
 import { connectDB } from './config/db.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -22,9 +21,15 @@ import planRoutes from './routes/plan.routes.js';
 const app = express();
 
 app.use(cors({
-    origin: env.clientOrigins.length ? env.clientOrigins : true,
+    origin: (process.env.CLIENT_URL || '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+        ? process.env.ADMIN_EMAIL : true,
+
     credentials: true,
 }));
+
 app.use(express.json());
 
 app.use('/api/user', userRoutes);
@@ -49,13 +54,13 @@ app.get('/', (req, res) => {
 });
 
 app.use(notFoundHandler);
-app.use(errorHandler); 
+app.use(errorHandler);
 
 const start = async () => {
     try {
         await connectDB();
-        app.listen(env.port, () => {
-            console.log(`Server running on port ${env.port}`);
+        app.listen(process.env.PORT, () => {
+            console.log(`Server running on port ${process.env.PROT}`);
         });
     } catch (err) {
         console.error('Failed to start server:', err);

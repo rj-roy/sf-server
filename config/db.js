@@ -1,7 +1,6 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { env } from './env.js';
 
-const client = new MongoClient(env.dbUri, {
+const client = new MongoClient(process.env.DB_URI, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: false,
@@ -19,16 +18,16 @@ export const connectDB = async () => {
     await client.connect();
     await client.db('admin').command({ ping: 1 });
 
-    db = client.db(env.dbName);
+    db = client.db(process.env.DB_NAME);
 
     collections = {
-        userCollection: db.collection(env.collections.users),
-        startupsCollection: db.collection(env.collections.startups),
-        opportunitiesCollection: db.collection(env.collections.opportunities),
-        applicationsCollection: db.collection(env.collections.applications),
-        sessionCollection: db.collection(env.collections.sessions),
-        subscriptonCollection: db.collection(env.collections.subscription),
-        planCollection: db.collection(env.collections.plan),
+        userCollection: db.collection(process.env.USERS_COLLECTION),
+        startupsCollection: db.collection(process.env.STARTUPS_COLLECTION),
+        opportunitiesCollection: db.collection(process.env.OPPORTUNITIES_COLLECTION),
+        applicationsCollection: db.collection(process.env.APPLICATIONS_COLLECTION),
+        sessionCollection: db.collection(process.env.SESSION_COLLECTION),
+        subscriptonCollection: db.collection(process.env.SUBSCRIPTION_COLLECTION),
+        planCollection: db.collection(process.env.PLAN_COLLECTION),
     };
 
     console.log('MongoDB connected');
